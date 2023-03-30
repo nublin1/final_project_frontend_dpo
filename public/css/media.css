@@ -1,0 +1,102 @@
+@media (max-width: 768px) {
+  .container {
+    max-width: 768px;
+  } 
+
+  td {
+    padding: 10px 0;
+  }
+
+  .table-data-id {
+    padding-left: 10px;
+  }
+
+  .table-data-name {
+    padding: 10px;
+    min-width: 160px;
+  }
+
+  .table-data-contacts {
+    min-width: 135px;
+  }
+
+  .table-data-buttons {
+    flex-direction: column;
+    min-width: 110px;
+  }
+}
+
+@media (max-width: 699px) {
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .search-form {
+    width: 100%;
+  }
+}
+
+@media (max-width: 320px) {
+  .modal {
+    padding: 10px;
+  }
+
+  .modal-header {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .row-header {
+    padding: 0;
+    height: 40px;
+    justify-content: center;
+  }
+
+  .header-logo {
+    margin-right: 0;
+  }
+
+  .filter-form {
+    display: none;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .contacts-space {
+    padding: 0;
+  }
+
+  .btn-dropdown-button-content {
+    padding: 10px;
+    width: 110px;
+  }
+
+  .contact-element {
+    justify-content: center;
+  }
+
+  .form-newclient {
+    padding: 0 10px;
+  }
+
+  .form-editclient,
+  .contact-form-input {
+    padding: 10px 5px;
+    max-width: 130px;
+  }
+
+  .modal-content-delete {
+    padding: 0 10px;
+    max-width: 275px;
+  }
+
+  .footer-error {
+    padding: 9px 20px;
+  }
+}
