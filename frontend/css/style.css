@@ -73,7 +73,8 @@ a {
   line-height: 19px;
 
   background: transparent;
-  border: none;
+  border: none;  
+  cursor: pointer;
 }
 
 .btn-table-delete {
@@ -82,7 +83,8 @@ a {
   line-height: 19px;
 
   background: transparent;
-  border: none;
+  border: none;  
+  cursor: pointer;
 }
 
 .btn-show-all-contacts {
@@ -90,8 +92,14 @@ a {
   border: none;
 }
 
+.action-buttons {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
 .action-buttons:not(:last-child) {
-  margin-right: 25px;
+  margin-right: 25px;  
 }
 
 .btn-addclient {
@@ -104,6 +112,7 @@ a {
   text-align: center;
   color: #9873FF;
 
+  cursor: pointer;
   border: solid 1px #9873FF;
 }
 
@@ -182,6 +191,7 @@ a {
 .btn-cls {
   background: transparent;
   border: none;
+  cursor: pointer;
 }
 
 .btn-savecontact {
@@ -193,6 +203,8 @@ a {
   font-size: 14px;
   line-height: 19px;
   color: #FFFFFF;
+
+  cursor: pointer;
 
   background: #9873FF;
   border: none;
@@ -210,8 +222,8 @@ a {
   font-size: 12px;
   line-height: 16px;
 
-
   text-decoration-line: underline;
+  cursor: pointer;
 
   border: none;
   background: none;
@@ -259,7 +271,7 @@ a {
 .header {
   z-index: 1;
   position: relative;
-  box-shadow: 0 5px 10px red;
+  box-shadow:0px 9.03012px 27.0904px rgba(176, 190, 197, 0.32), 0px 3.38629px 5.64383px rgba(176, 190, 197, 0.32);;
 }
 
 .row-header {
@@ -294,7 +306,7 @@ a {
 
 .svg-edit-person {
   display: inline-block;
-  margin-right: 3px;
+  margin-right: 3px; 
 }
 
 .svg-delete-person {
@@ -331,6 +343,10 @@ a {
   line-height: 16px;
 }
 
+.table th.table-header-cell--id {
+  color: #9873FF;
+}
+
 .table tr:not(:last-child) {
   border-bottom: 1px solid #E5E5E5;
 }
@@ -350,7 +366,7 @@ td {
 }
 
 .table-header-cell--id {
-  padding-left: 40px;
+  padding-left: 40px; 
 }
 
 .table-data-id {
@@ -390,13 +406,17 @@ td {
   display: flex;
 }
 
-.table-contacts-list {
+.table-contacts-list {  
   display: flex;
+  flex-wrap: wrap;
+  max-width: 115px ;
+  row-gap: 10px;
 }
 
 .table-contacts-list-element {
   margin-right: 5px;
 }
+
 
 /*#endregion */
 
@@ -608,6 +628,7 @@ td {
 .modal {
   z-index: 1010;
   overflow: auto;
+  display: none;
   display: flex;
   justify-content: center;
   position: fixed;
@@ -615,7 +636,7 @@ td {
   left: 0;
   width: 100%;
   height: 100%;
-  padding: 20px;
+  padding: 20px;  
 }
 
 .modal_content {
@@ -626,6 +647,12 @@ td {
   margin-bottom: auto;
 
   background-color: #fff;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease-in-out;
+}
+
+.modal--open .modal_content{
+  transform: translateY(0);
 }
 
 .modal-header {
@@ -663,13 +690,12 @@ td {
 }
 
 .modal-window {
-  opacity: 0;
-  transition: opacity .4s ease;
+  display: none;
+  transition: display 0.8s ease-in-out;
 }
 
-
-.modal-window--open {
-  opacity: 1;
+.modal-window--open { 
+  display: block;  
 }
 
 .modal-blackout {
@@ -699,14 +725,15 @@ td {
   font-size: 10px;
   line-height: 14px;
   color: #F06A4D;
+}
 
+.show {
+  display: block !important;
+}
+
+.hide {
   display: none;
 }
-
-.footer-error--show {
-  display: block;
-}
-
 
 .header-title {
   margin-right: auto;
@@ -729,4 +756,41 @@ td {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.input-placeholder input {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 19px;
+}
+
+.form-group input:valid+.placeholder {
+  display: none;
+}
+
+
+
+.placeholder {
+  margin: auto;
+  position: absolute;
+  pointer-events: none;
+
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 19px;
+  color: #B0B0B0;
+}
+
+.placeholder span {
+  color: #9873FF;
+}
+
+.span-fill {
+  width: 100%;
+}
+
+.highlight {  
+  color: rgb(192, 188, 188) ;
 }
