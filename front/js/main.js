@@ -8,6 +8,7 @@ let isNewClientActive = false;
 let isEditClientActive = false;
 let isDeleteClientActive = false;
 
+
 function showModalClient(name, clientID = null) {
   //console.log(name);  
   if (name !== 'addClient' && name !== 'deleteClient' && name !== 'editClient') {
@@ -28,12 +29,9 @@ function showModalClient(name, clientID = null) {
     if (modalQueue.length === 0) {
       modalQueue.push('editClient');
     }
-    
+
   }
   else if (name === 'deleteClient') {
-    if (clientID !== null) {
-      currentClientID = clientID;
-    }
     if (modalQueue.length > 0) {
       modal_editClient.classList.remove('modal-window--open');
     }
@@ -43,7 +41,7 @@ function showModalClient(name, clientID = null) {
     modalQueue.push('deleteClient');
   }
 
-  const timer = new Promise(resolve => setTimeout(resolve, 200));
+  const timer = new Promise(resolve => setTimeout(resolve, 250));
   timer.then(() => {
     document.addEventListener('click', handleOutsideClick);
   })
@@ -132,10 +130,15 @@ function editModalSetData() {
 const filterInput = document.querySelector('.search-form');
 filterInput.addEventListener('input', (event) => {
   event.preventDefault();
-  setTimeout(() => {
+  setTimeout(async () => {
     const searchValue = event.target.value.toLowerCase();
     //console.log(searchValue);
-    loadClients(searchValue);
+    let answer = await loadClients(searchValue);
+    if (answer) {
+      clientsList = answer;
+      //sortById("id", document.querySelector('.table-header-cell--id'));
+      renderTableBody();
+    }
   }, 300);
 })
 
@@ -219,7 +222,7 @@ function sortBy(data, prop, dir, comparator) {
 }
 
 function changeArrowDir(obj) {
-  const img = obj.querySelector('img:first-child');
+  const img = obj.querySelector('img');
   let strForCompare = img.src.replace('http://127.0.0.1:5500/', '');
 
   if (strForCompare === 'img/Arrow-up.svg') {
@@ -342,11 +345,16 @@ function renderTableRow(client) {
   const editButts = tr.querySelectorAll('.action-buttons');
   editButts[0].addEventListener('click', async (e) => {
     e.preventDefault();
-    await getClient(client.id);
-    showModalClient('editClient');
+    let answer = await getClient(client.id);
+    if (answer) {
+      currentClientData = answer;
+      currentClientID = currentClientData.id;
+      showModalClient('editClient');
+    }
   })
   editButts[1].addEventListener('click', (e) => {
-    showModalClient('deleteClient', client.id);
+    currentClientData = client;
+    showModalClient('deleteClient');
   })
 
 
@@ -373,7 +381,7 @@ function formateTime(date) {
 
 //#region validator
 let formNew = document.querySelector('.form-newclient');
-let forEdit = document.querySelector('.form-editclient');
+let formEdit = document.querySelector('.form-editclient');
 
 const formNewFields = [
   {
@@ -385,18 +393,18 @@ const formNewFields = [
 
 const formEditFields = [
   {
-    fsurname: forEdit.querySelector('[name="surname"]'),
-    fname: forEdit.querySelector('[name="name"]'),
-    flastname: forEdit.querySelector('[name="lastname"]')
+    fsurname: formEdit.querySelector('[name="surname"]'),
+    fname: formEdit.querySelector('[name="name"]'),
+    flastname: formEdit.querySelector('[name="lastname"]')
   },
 ]
 
 const fakePlaceholderLastname = document.getElementById('fakePlaceholderLastname');
 
 // newForm
-const validatorNewForm = new JustValidate('.form-newclient', { silent: true, showSuccess: false, });
+let validatorNewForm = new JustValidate(formNew, { errorLabelStyle: { display: 'none' } });
 validatorNewForm.onFail(function (errors) {
-  console.log(errors);
+  // console.log(errors);
   const contactsSpace = document.getElementById('modalWindow_newClient').querySelector('.contacts-space');
   const errFields = document.getElementById('modalWindow_newClient').querySelector('.footer-error');
   errFields.innerHTML = '';
@@ -410,12 +418,49 @@ validatorNewForm.onFail(function (errors) {
   errFields.classList.remove('hide');
   contactsSpace.classList.add('no-margin');
 })
+validatorNewForm.onSuccess(async (event) => {
+  event.preventDefault();
+  const contactsUlElement = document.getElementById('modalWindow_newClient').querySelector(".contact-list");
+  const contactsList = contactsUlElement.children;
+  const contacts = [];
+  for (let item of contactsList) {
+    //console.log(item);
+    const newCon = {
+      type: item.firstElementChild.value,
+      value: item.children[1].value,
+    };
+    contacts.push(newCon);
+  }
 
-validatorNewForm.onSuccess(function (event) {
+  const client = {
+    name: formNewFields[0].fname.value,
+    surname: formNewFields[0].fsurname.value,
+    lastName: formNewFields[0].flastname.value,
+    contacts: contacts,
+  };
+
+  let answer = await addClient(client);
+  if (answer) {
+    //console.log(answer);
+    clearForm(modal_newClient, formNewFields);
+    clientsList.push(answer);
+    hideModalClient(modalQueue[modalQueue.length - 1]);
+    renderTableBody();
+  }
 })
 
+const newClientValidate = modal_newClient.querySelector('.btn-savecontact');
+newClientValidate.addEventListener('click', function (event) {
+  addValidatorCheckFields(validatorNewForm, formNewFields);
+  const contactsList = document.getElementById('modalWindow_newClient').querySelector(".contact-list").children;
+  if (contactsList.length !== 0) {
+    addValidatorCheckContacts(validatorNewForm, contactsList);
+  }
+})
+
+
 // editForm
-const validatorEditForm = new JustValidate('.form-editclient', { silent: true, showSuccess: false, errorsContainer: document.getElementById('modalWindow_editClient').querySelector('.footer-error'), });
+const validatorEditForm = new JustValidate('.form-editclient', { silent: true, showSuccess: false, errorLabelStyle: { display: 'none' } });
 validatorEditForm.onFail(function (errors) {
   const contactsSpace = document.getElementById('modalWindow_editClient').querySelector('.contacts-space');
   const errFields = document.getElementById('modalWindow_editClient').querySelector('.footer-error');
@@ -450,8 +495,37 @@ validatorEditForm.onSuccess(function (event) {
     lastName: formEditFields[0].flastname.value,
     contacts: contacts,
   };
+  hideModalClient(modalQueue[modalQueue.length - 1]);
+  clearForm(modal_editClient, formEditFields);
   editClient(client);
 })
+
+
+const editClientValidate = modal_editClient.querySelector('.btn-savecontact');
+editClientValidate.addEventListener('click', function (event) {
+  addValidatorCheckFields(validatorEditForm, formEditFields);
+  const contactsList = document.getElementById('modalWindow_editClient').querySelector(".contact-list").children;
+  if (contactsList.length !== 0) {
+    addValidatorCheckContacts(validatorEditForm, contactsList);
+  }
+
+  validatorEditForm.revalidate().then(isValid => {
+    history.pushState(null, null, '/');
+  });
+})
+
+function clearForm(form, fields) {
+  fields.forEach((field) => {
+    for (const key in field) {
+      if (Object.hasOwnProperty.call(field, key)) {
+        field[key].value = '';
+      }
+    }
+  });
+  const errFields = form.querySelector('.footer-error');
+  errFields.innerHTML = '';
+
+}
 
 function addValidatorCheckFields(validator, fields) {
   validator.addField(fields[0].fsurname, [
@@ -493,6 +567,7 @@ function addValidatorCheckFields(validator, fields) {
       errorMessage: 'Слишком много символов в поле Отчество'
     },
   ])
+
 }
 
 function addValidatorCheckContacts(validator, contactsList) {
@@ -506,58 +581,8 @@ function addValidatorCheckContacts(validator, contactsList) {
   }
 }
 
-const newClientValidate = modal_newClient.querySelector('.btn-savecontact');
-newClientValidate.addEventListener('click', function (event) {
-  event.preventDefault();
-
-  const contactsList = document.getElementById('modalWindow_newClient').querySelector(".contact-list").children;
-  if (contactsList.length !== 0) {
-    addValidatorCheckContacts(validatorNewForm, contactsList);
-  }
-
-  validatorNewForm.revalidate().then(isValid => {
-    if (isValid) {
-      handleRevalidationSuccess();
-    }
-  });
-})
-
-function handleRevalidationSuccess() {
-  const contactsUlElement = document.getElementById('modalWindow_newClient').querySelector(".contact-list");
-  const contactsList = contactsUlElement.children;
-  const contacts = [];
-  for (let item of contactsList) {
-    //console.log(item);
-    const newCon = {
-      type: item.firstElementChild.value,
-      value: item.children[1].value,
-    };
-    contacts.push(newCon);
-  }
-
-  const client = {
-    name: formNewFields[0].fname.value,
-    surname: formNewFields[0].fsurname.value,
-    lastName: formNewFields[0].flastname.value,
-    contacts: contacts,
-  };
-
-  addClient(client);
-}
-
-function validatEditForm() {
-  const contactsList = document.getElementById('modalWindow_editClient').querySelector(".contact-list").children;
-  if (contactsList.length !== 0) {
-    addValidatorCheckContacts(validatorEditForm, contactsList);
-  }
-
-  validatorEditForm.revalidate().then(isValid => {
-    history.pushState(null, null, '/');
-  });
-}
-
 function hideFakePlaceholder() {
-  if (flastname.value !== '') {
+  if (formNewFields[0].flastname.value !== '') {
     fakePlaceholderLastname.classList.remove('show');
   }
   else {
@@ -678,13 +703,9 @@ async function loadClients(filter = '') {
     method: 'GET',
   })
   if (responce.status === 200) {
-    clientsList = await responce.json();
-    //console.log(clientsList);
-
-    sortById("id", document.querySelector('.table-header-cell--id'));
-    renderTableBody();
-    document.querySelector('.preloader-indicator').classList.add('hide');
-    document.querySelector('.table').classList.add('table-margin');
+    let data = await responce.json();
+    //console.log(data);
+    return data;
   }
   else {
     clientsList = [];
@@ -699,17 +720,22 @@ async function addClient(client) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(client)
   })
+  if (responce.ok) {
+    let data = await responce.json();
+    //console.log(data);
+    return data;
+  }
 }
 
 async function getClient(clientID) {
-  await fetch(DATABASE_ADRESS + '/api/clients/' + clientID, {
+  const responce = await fetch(DATABASE_ADRESS + '/api/clients/' + clientID, {
     method: 'GET',
-  }).then(response => response.json())
-    .then(data => {
-      currentClientData = data;
-      currentClientID = currentClientData.id;
-
-    })
+  })
+  if (responce.status === 200) {
+    let data = await responce.json();
+    //console.log(data);
+    return data;
+  }
 }
 
 async function editClient(client) {
@@ -720,14 +746,13 @@ async function editClient(client) {
   })
 }
 
-async function deleteClient() {
-  if (currentClientID === null) {
-    return;
-  }
-
-  const responce = await fetch(DATABASE_ADRESS + '/api/clients/' + currentClientID, {
+async function deleteClient(id) {
+  const responce = await fetch(DATABASE_ADRESS + '/api/clients/' + id, {
     method: 'DELETE',
   })
+  if (responce.status === 200) {
+    return true;
+  }
 }
 //#endregion
 
@@ -744,20 +769,50 @@ function handleHashChange() {
   }
 }
 
-document.addEventListener('DOMContentLoaded', async (e) => {
-  e.preventDefault();
-  loadClients();
-
-  addValidatorCheckFields(validatorNewForm, formNewFields);
-  addValidatorCheckFields(validatorEditForm, formEditFields);
-
+function Innit() {
   modal_newClient.querySelector('.btn-addcontact').addEventListener('click', () => addNewContact(modal_newClient));
   modal_editClient.querySelector('.btn-addcontact').addEventListener('click', () => addNewContact(modal_editClient));
+  document.getElementById('deleteClientOK').addEventListener('click', async (e) => {
+    e.preventDefault();
+    let answer = await deleteClient(currentClientData.id);
+    if (answer) {
+      const indexToDelete = clientsList.findIndex(element => element.id === currentClientData.id);
+      if (indexToDelete !== -1) {
+        clientsList.splice(indexToDelete, 1);
+      }
+
+      for (let i = modalQueue.length; i >= 0; i--) {
+        hideModalClient(modalQueue[i]);
+      }
+
+      history.pushState(null, null, '/');
+      renderTableBody();
+    }
+  })
+}
+
+document.addEventListener('DOMContentLoaded', async (e) => {
+  e.preventDefault();
+  let answer = await loadClients();
+  if (answer) {
+    clientsList = answer;
+    sortById("id", document.querySelector('.table-header-cell--id'));
+    renderTableBody();
+
+    document.querySelector('.preloader-indicator').classList.add('hide');
+    document.querySelector('.table').classList.add('table-margin');
+  }
+
+  Innit();
 
   let id = handleHashChange();
   if (id !== null && typeof id !== undefined) {
     id = id.replace('#', '');
-    await getClient(id);
+    let answer = await getClient(id);
+    if (answer) {     
+      currentClientData = answer;
+      currentClientID = currentClientData.id;
+    }
     showModalClient('editClient');
   }
 });

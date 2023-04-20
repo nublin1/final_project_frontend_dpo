@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="ru">
 
   <head>
     <meta charset="UTF-8">
@@ -35,7 +35,7 @@
       <section class="section">
         <div class="container">
           <h1 class="section-h1">Клиенты</h1>
-          <table class="table">
+          <table class="table" cellspacing = "10" cellpadding = "10">
             <thead class="table-head">
               <tr>
                 <th onclick="sortById('id', this)" class="table-header-cell
@@ -51,12 +51,12 @@
                 </th>
                 <th onclick="sortByCreatedAt('createdAt', this)"
                   class="table-header-cell">
-                  Дата и время создания
+                  Дата и время <br> создания
                   <img src="img/Arrow-up.svg" alt="Сортировка по возрастанию">
                 </th>
                 <th onclick="sortByUpdatedAt('updatedAt', this)"
                   class="table-header-cell">
-                  Последние изменения
+                  Последние <br> изменения
                   <img src="img/Arrow-up.svg" alt="Сортировка по возрастанию">
                 </th>
                 <th class="table-header-cell">Контакты</th>
@@ -137,7 +137,7 @@
                       </button>
                     </div>
 
-                    <form class="form-newclient">
+                    <form class="form-newclient" id="form_newClient111">
                       <div class="form-group">
                         <input class="form-name" type="text" name="surname"
                           required>
@@ -176,7 +176,8 @@
                     </div>
                     <div class="modal-footer">
                       <div class="footer-error hide"> </div>
-                      <button href="#" class="btn-savecontact"> Сохранить
+                      <button form="form_newClient111" type="submit"
+                        class="btn-savecontact"> Сохранить
                       </button>
                       <button class="btn-delelecontact"
                         onclick="hideModalClient('addClient')"> Отмена
@@ -246,8 +247,7 @@
                       </div>
                       <div class="modal-footer">
                         <div class="footer-error hide"> </div>
-                        <button class="btn-savecontact"
-                          onclick="validatEditForm()"> Сохранить </button>
+                        <button class="btn-savecontact"> Сохранить </button>
                         <button class="btn-delelecontact"
                           onclick="showModalClient('deleteClient')"> Удалить
                           клиента </button>
@@ -284,8 +284,8 @@
                           </p>
                         </div>
                         <div class="modal-footer">
-                          <button class="btn-savecontact" id="deleteClientOK"
-                            onclick="deleteClient()"> Удалить </button>
+                          <button class="btn-savecontact" id="deleteClientOK">
+                            Удалить </button>
                           <button class="btn-delelecontact"
                             onclick="hideModalClient('deleteClient')"> Отмена
                           </button>
