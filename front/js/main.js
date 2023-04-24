@@ -460,8 +460,9 @@ newClientValidate.addEventListener('click', function (event) {
 
 
 // editForm
-const validatorEditForm = new JustValidate('.form-editclient', { silent: true, showSuccess: false, errorLabelStyle: { display: 'none' } });
+let validatorEditForm = new JustValidate(formEdit, { errorLabelStyle: { display: 'none' } });
 validatorEditForm.onFail(function (errors) {
+  // console.log(errors);
   const contactsSpace = document.getElementById('modalWindow_editClient').querySelector('.contacts-space');
   const errFields = document.getElementById('modalWindow_editClient').querySelector('.footer-error');
   errFields.innerHTML = '';
@@ -476,7 +477,8 @@ validatorEditForm.onFail(function (errors) {
   contactsSpace.classList.add('no-margin');
 })
 
-validatorEditForm.onSuccess(function (event) {
+validatorEditForm.onSuccess(async (event) => {
+  event.preventDefault();
   const contactsUlElement = document.getElementById('modalWindow_editClient').querySelector(".contact-list");
   const contactsList = contactsUlElement.children;
   const contacts = [];
@@ -497,7 +499,14 @@ validatorEditForm.onSuccess(function (event) {
   };
   hideModalClient(modalQueue[modalQueue.length - 1]);
   clearForm(modal_editClient, formEditFields);
-  editClient(client);
+  let answer = await editClient(client);
+  if (answer) {
+    let index = clientsList.findIndex(client => client.id === answer.id);
+    clientsList[index] = answer;
+    renderTableBody();
+    history.pushState(null, null, '/');
+  }
+
 })
 
 
@@ -507,11 +516,8 @@ editClientValidate.addEventListener('click', function (event) {
   const contactsList = document.getElementById('modalWindow_editClient').querySelector(".contact-list").children;
   if (contactsList.length !== 0) {
     addValidatorCheckContacts(validatorEditForm, contactsList);
-  }
-
-  validatorEditForm.revalidate().then(isValid => {
-    history.pushState(null, null, '/');
-  });
+  } 
+  //console.log(clientsList);
 })
 
 function clearForm(form, fields) {
@@ -744,6 +750,11 @@ async function editClient(client) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(client)
   })
+  if (responce.ok) {
+    let data = await responce.json();
+    //console.log(data);
+    return data;
+  }
 }
 
 async function deleteClient(id) {
@@ -769,7 +780,7 @@ function handleHashChange() {
   }
 }
 
-function Innit() {
+function Init() {
   modal_newClient.querySelector('.btn-addcontact').addEventListener('click', () => addNewContact(modal_newClient));
   modal_editClient.querySelector('.btn-addcontact').addEventListener('click', () => addNewContact(modal_editClient));
   document.getElementById('deleteClientOK').addEventListener('click', async (e) => {
@@ -803,13 +814,13 @@ document.addEventListener('DOMContentLoaded', async (e) => {
     document.querySelector('.table').classList.add('table-margin');
   }
 
-  Innit();
+  Init();
 
   let id = handleHashChange();
   if (id !== null && typeof id !== undefined) {
     id = id.replace('#', '');
     let answer = await getClient(id);
-    if (answer) {     
+    if (answer) {
       currentClientData = answer;
       currentClientID = currentClientData.id;
     }

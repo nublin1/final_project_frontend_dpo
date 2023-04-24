@@ -137,7 +137,7 @@
                       </button>
                     </div>
 
-                    <form class="form-newclient" id="form_newClient111">
+                    <form class="form-newclient" id="form_newClient">
                       <div class="form-group">
                         <input class="form-name" type="text" name="surname"
                           required>
@@ -176,7 +176,7 @@
                     </div>
                     <div class="modal-footer">
                       <div class="footer-error hide"> </div>
-                      <button form="form_newClient111" type="submit"
+                      <button form="form_newClient" type="submit"
                         class="btn-savecontact"> Сохранить
                       </button>
                       <button class="btn-delelecontact"
@@ -210,26 +210,23 @@
                         </button>
                       </div>
 
-                      <form class="form-editclient">
+                      <form class="form-editclient" id="form_editclient">
                         <fieldset class="editclient-fieldset">
                           <legend class="form-client-legend">Фамилия <span>*</span></legend>
                           <div class="form-group">
-                            <input class="form-name" type="text"
-                              name="surname" required>
+                            <input class="form-name" type="text" name="surname" required>
                           </div>
                         </fieldset>
                         <fieldset class="editclient-fieldset">
                           <legend class="form-client-legend">Имя <span>*</span></legend>
                           <div class="form-group">
-                            <input class="form-name" type="text" name="name"
-                              required>
+                            <input class="form-name" type="text" name="name" required>
                           </div>
                         </fieldset>
                         <fieldset class="editclient-fieldset">
                           <legend class="form-client-legend">Отчество</legend>
                           <div class="form-group">
-                            <input class="form-name" type="text"
-                              name="lastname">
+                            <input class="form-name" type="text" name="lastname">
                           </div>
                         </fieldset>
                       </form>
@@ -247,7 +244,7 @@
                       </div>
                       <div class="modal-footer">
                         <div class="footer-error hide"> </div>
-                        <button class="btn-savecontact"> Сохранить </button>
+                        <button class="btn-savecontact" form="form_editclient" type="submit"> Сохранить </button>
                         <button class="btn-delelecontact"
                           onclick="showModalClient('deleteClient')"> Удалить
                           клиента </button>
